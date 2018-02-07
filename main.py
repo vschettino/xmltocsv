@@ -3,6 +3,12 @@ import csv
 import sys
 
 
+def sanitize(channel, value):
+    if(channel == "ts"):
+        value = value.split('.')[0]
+    return value.replace('.', ',')
+
+
 def xml_to_csv(xml_file, csv_file):
     ns = {'auth': 'http://rddl.xmlinside.net/PowerMeasurement/data/ion/authenticated/1/'}
 
@@ -12,8 +18,8 @@ def xml_to_csv(xml_file, csv_file):
     device = auth_data.find('auth:Device', ns)
     data_recorder = device.find('auth:DataRecorder', ns)
 
-    header = []
-    channels = []
+    header = ['timestamp']
+    channels = ['ts']
     for child in data_recorder.find('auth:Channels', ns):
         header.append(child.attrib.get('label'))
         channels.append(child.attrib.get('id'))
@@ -22,7 +28,8 @@ def xml_to_csv(xml_file, csv_file):
     for child in data_recorder.find('auth:DataRecords', ns):
         attrs = []
         for channel in channels:
-            attrs.append(child.attrib.get(channel))
+            value = sanitize(channel, (child.attrib.get(channel, '')))
+            attrs.append(value)
         body.append(attrs)
 
     with open(csv_file, 'w+') as csvfile:
