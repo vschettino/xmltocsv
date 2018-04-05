@@ -12,8 +12,10 @@ def sanitize(channel, value):
 def xml_to_csv(xml_file, csv_file):
     ns = {'auth': 'http://rddl.xmlinside.net/PowerMeasurement/data/ion/authenticated/1/'}
 
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
+    s = open(xml_file, 'r').read()
+    s = s.replace('<![CDATA[', '')
+    s = s.replace(']]>', '')
+    root = ET.fromstring(s)
     auth_data = (root.find('auth:AuthenticationData', ns))
     device = auth_data.find('auth:Device', ns)
     data_recorder = device.find('auth:DataRecorder', ns)
