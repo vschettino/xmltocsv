@@ -1,11 +1,15 @@
 import xml.etree.ElementTree as ET
 import csv
 import sys
+import datetime
+from pytz import timezone
 
 
 def sanitize(channel, value):
     if(channel == "ts"):
-        value = value.split('.')[0]
+        dt = datetime.datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%fZ')
+        dt = timezone('UTC').localize(dt)
+        value = (dt.astimezone(timezone('America/Sao_Paulo')).strftime('%Y-%m-%dT%H:%M:%S'))
     return value.replace('.', ',')
 
 
